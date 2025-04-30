@@ -29,8 +29,8 @@ func newDB(connect, option string) (*sql.DB, error) {
 	return sql.Open(dbms, connect)
 }
 
-func newConnect(host, database, user, password string) string {
-	return strings.Join([]string{user, ":", password, "@", "tcp(", host, ":3306)/", database}, "")
+func newConnect(host, database, user, password ,port string) string {
+	return strings.Join([]string{user, ":", password, "@", "tcp(", host, ":",port, ")/", database}, "")
 }
 
 func NewSqlHandler(log logger.Logger, config pvtconfig.SQL) gateway.SqlHandler {
@@ -38,9 +38,10 @@ func NewSqlHandler(log logger.Logger, config pvtconfig.SQL) gateway.SqlHandler {
 	database := config.GetDatabase()
 	user := config.GetUser()
 	password := config.GetPassword()
+	port := config.GetPort()
 	log.Debug("SqlHandler created variables from Config")
 
-	connect := newConnect(host, database, user, password)
+	connect := newConnect(host, database, user, password, port)
 	db, err := newDB(connect, optionSingleStatement)
 	if err != nil {
 		log.Panic(err)
@@ -74,9 +75,10 @@ func NewMapSqlHandler(log logger.Logger, sqlconfigs map[string]pvtconfig.SQL) ma
 		database := config.GetDatabase()
 		user := config.GetUser()
 		password := config.GetPassword()
+		port := config.GetPort()
 		log.Debugf("SqlHandler created variables from Config for host:%s and dbtype:%s", host, i)
 
-		connect := newConnect(host, database, user, password)
+		connect := newConnect(host, database, user, password, port)         
 		db, err := newDB(connect, optionSingleStatement)
 		if err != nil {
 			log.Panic(err)
